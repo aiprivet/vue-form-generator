@@ -5,11 +5,11 @@ export interface FormField {
   placeholder?: string
   required?: boolean
   options?: Array<{ value: string | number; label: string }>
-  attributes?: Record<string, unknown>
+  attributes?: Record<string, any>
 }
 
-export interface FormSchema {
-  fields: FormField[]
+export type FormSchema<T extends Record<string, any>> = {
+  fields: Array<FormField & { name: keyof T }>
   submitText?: string
   cancelText?: string
 }

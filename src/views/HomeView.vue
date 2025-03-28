@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>This is an about page</h1>
+    <h1>Select demo form</h1>
   </div>
 </template>
 

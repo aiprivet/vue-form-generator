@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { useFormsStore } from '@/stores/form'
 import type { FormSchema } from '@/types'
+const { forms, addForm } = useFormsStore()
+
+interface FormModel {
+  [key: string]: string | boolean
+}
 
 interface FormGeneratorProps {
-  schema: FormSchema
-  modelValue: Record<string, string | boolean>
+  schema: FormSchema<FormModel>
+  modelValue: FormModel
 }
 
 const props = defineProps<FormGeneratorProps>()
@@ -25,7 +31,14 @@ const handleClear = () => {
         v-if="field.type === 'input'"
         v-bind="field.attributes"
         :value="modelValue[field.name]"
-        @input="handleUpdate(field.name, ($event.target as HTMLInputElement).value)"
+        @input="
+          handleUpdate(
+            field.name,
+            field?.attributes?.type === 'checkbox'
+              ? ($event.target as HTMLInputElement).checked
+              : ($event.target as HTMLInputElement).value,
+          )
+        "
       />
 
       <textarea
@@ -33,7 +46,8 @@ const handleClear = () => {
         v-bind="field.attributes"
         :value="modelValue[field.name] as string"
         @input="handleUpdate(field.name, ($event.target as HTMLTextAreaElement).value)"
-      ></textarea>
+      >
+      </textarea>
 
       <select
         v-if="field.type === 'select'"
@@ -47,9 +61,20 @@ const handleClear = () => {
       </select>
     </template>
 
-    <div>Current form data: {{ JSON.stringify(modelValue) }}</div>
-    <button>Save</button>
-    <button @click.prevent="handleClear">Clear</button>
+    <button @click.prevent="() => addForm(JSON.stringify(modelValue).split(',').join('\n,'))">
+      {{ props.schema.submitText || 'Save' }}
+    </button>
+    <button @click.prevent="handleClear">{{ props.schema.cancelText || 'Clear' }}</button>
+    <div>
+      Current form data:
+      <p>{{ JSON.stringify(modelValue).split(',').join('\n,') }}</p>
+    </div>
+    <div>
+      Saved forms:
+      <div :key="form" v-for="form in forms">
+        <p>{{ form }}</p>
+      </div>
+    </div>
   </form>
 </template>
 
@@ -58,7 +83,7 @@ const handleClear = () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 400px;
+  width: 300px;
   margin: 0 auto;
 }
 </style>

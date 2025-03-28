@@ -3,21 +3,28 @@ import FormGenerator from '@/components/FormGenerator.vue'
 import type { FormSchema } from '@/types'
 import { ref } from 'vue'
 
-const formData = ref({
+interface RegistrationFormData {
+  name: string
+  email: string
+  password: string
+  gender: string
+}
+
+const formData = ref<RegistrationFormData>({
   name: '132',
   email: '',
   password: '',
   gender: '0',
 })
 
-const formSchema: FormSchema = ref({
+const formSchema: FormSchema<RegistrationFormData> = {
   fields: [
     {
       type: 'input',
       name: 'name',
       label: 'Full Name',
       attributes: {
-        type: 'email',
+        type: 'text',
         placeholder: 'Enter your full name',
         required: true,
       },
@@ -55,11 +62,11 @@ const formSchema: FormSchema = ref({
   ],
   submitText: 'Submit',
   cancelText: 'Cancel',
-})
+}
 </script>
 <template>
   <div class="registration">
-    <FormGenerator v-model="formData" :schema="formSchema" />
+    <FormGenerator v-model="formData" :schema="formSchema as any" />
   </div>
 </template>
 
